@@ -44,7 +44,11 @@ ML regression model to predict PG (paying guest) rental prices in Chennai based 
 - `locality_mapping.pkl`, `transit_locality_median.pkl`, `lifestyle_locality_median.pkl` — encoding/imputation maps
 - `feature_columns.pkl` — expected column order for inference
 
+## How to run
 
+```bash
+pip install -r requirements.txt
+```
 
 Open `Notebook/06-EDA-Preprocessing.ipynb` and run cells top to bottom. Raw data expected at `Data/raw/chennai_pg_dataset.csv` relative to project root.
 
