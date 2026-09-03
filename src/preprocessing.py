@@ -1,4 +1,4 @@
- """
+"""
 Phase 2: Preprocessing
 fit_preprocessing() is called ONCE on training data - fits all encoders/scaler/mappings.
 transform_data() is called on train/val/test/new-data - applies already-fitted objects only.
@@ -101,6 +101,10 @@ def _apply_imputation_and_encoding(X: pd.DataFrame, artifacts: dict) -> pd.DataF
 
     # parking / available_for cleanup
     X = _clean_categoricals(X)
+
+    # deposit -> log1p transform (highly right-skewed, skew=11.37; reduces
+    # the influence of extreme outlier deposits e.g. Rs 200000 vs typical Rs 5000)
+    X['deposit'] = np.log1p(X['deposit'])
 
     # occupancy -> ordinal
     X['occupancy_encoded'] = artifacts['occupancy_encoder'].transform(X[['occupancy']])

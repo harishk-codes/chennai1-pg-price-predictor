@@ -52,7 +52,8 @@ def filter_invalid_rows(df: pd.DataFrame) -> pd.DataFrame:
 
 def fix_amenity_columns(df: pd.DataFrame) -> pd.DataFrame:
     """Fill missing amenity values with False (amenity not mentioned = not available), cast to bool."""
-    df[config.AMENITY_COLS] = df[config.AMENITY_COLS].fillna(False)
+    for col in config.AMENITY_COLS:
+        df[col] = df[col].fillna(False).infer_objects(copy=False)
     df[config.AMENITY_COLS] = df[config.AMENITY_COLS].astype(bool)
     print(f"[fix_amenity_columns] Shape: {df.shape}")
     return df
