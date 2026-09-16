@@ -45,7 +45,7 @@ ML regression model to predict PG (paying guest) rental prices in Chennai based 
 - `feature_columns.pkl` — expected column order for inference
 
 ## How to run
-
+   python -m src.train
 ```bash
 pip install -r requirements.txt
 ```
@@ -56,3 +56,7 @@ Open `Notebook/06-EDA-Preprocessing.ipynb` and run cells top to bottom. Raw data
 
 - R² (~0.45) indicates moderate predictive power — further feature engineering or a larger dataset could improve this
 - Small dataset (1436 rows) makes hyperparameter tuning results less stable across CV folds
+
+## How to predict
+   from src.predict import predict_rent
+   rent = predict_rent({...})
