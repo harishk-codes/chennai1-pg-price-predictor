@@ -37,6 +37,7 @@ Usage (from the command line, for a quick manual test):
 
 import os
 import joblib
+import numpy as np
 import pandas as pd
 
 from src import config
@@ -80,7 +81,15 @@ def predict_rent(listing: dict) -> float:
     # default any missing amenity flags to False, same convention as training
     for col in config.AMENITY_COLS:
         row.setdefault(col, False)
-
+    
+    # transit_score / lifestyle_score: if the user didn't supply them,
+    # leave them as NaN so transform_data() auto-fills via locality median
+    # (the exact same logic used for missing values during training).
+    row.setdefault("transit_score", np.nan)
+    row.setdefault("lifestyle_score", np.nan)
+    row.setdefault("latitude", np.nan)
+    row.setdefault("longitude", np.nan)
+    
     X_new = pd.DataFrame([row])
     X_transformed = transform_data(X_new, _ARTIFACTS)
 

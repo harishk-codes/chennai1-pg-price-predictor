@@ -38,7 +38,20 @@ def fit_preprocessing(X_train: pd.DataFrame, y_train: pd.Series) -> dict:
         X_train.groupby('locality')['lifestyle_score'].median().to_dict()
     )
     artifacts['overall_lifestyle_median'] = X_train['lifestyle_score'].median()
+    # latitude/longitude locality-average maps
+    # Training data always has real lat/long, so this fillna is a no-op for
+    # train/val/test. It only matters at inference time: if a new listing
+    # omits lat/long, we substitute the locality's typical coordinates.
+    artifacts['locality_lat_mean'] = (
+        X_train.groupby('locality')['latitude'].mean().to_dict()
+    )
+    artifacts['overall_lat_mean'] = X_train['latitude'].mean()
 
+    artifacts['locality_lon_mean'] = (
+        X_train.groupby('locality')['longitude'].mean().to_dict()
+    )
+    artifacts['overall_lon_mean'] = X_train['longitude'].mean()
+    
     # occupancy ordinal encoder 
     occupancy_encoder = OrdinalEncoder(categories=[config.OCCUPANCY_ORDER])
     occupancy_encoder.fit(X_train[['occupancy']])
@@ -98,7 +111,15 @@ def _apply_imputation_and_encoding(X: pd.DataFrame, artifacts: dict) -> pd.DataF
         X['locality'].map(artifacts['lifestyle_locality_median'])
     )
     X['lifestyle_score'] = X['lifestyle_score'].fillna(artifacts['overall_lifestyle_median'])
+    
+    # latitude / longitude - only relevant when a new listing omits them
+    # (training data is always complete here, so this is a no-op for train/val/test)
+    X['latitude'] = X['latitude'].fillna(X['locality'].map(artifacts['locality_lat_mean']))
+    X['latitude'] = X['latitude'].fillna(artifacts['overall_lat_mean'])
 
+    X['longitude'] = X['longitude'].fillna(X['locality'].map(artifacts['locality_lon_mean']))
+    X['longitude'] = X['longitude'].fillna(artifacts['overall_lon_mean'])
+    
     # parking / available_for cleanup
     X = _clean_categoricals(X)
 
@@ -145,4 +166,4 @@ def transform_data(X: pd.DataFrame, artifacts: dict) -> pd.DataFrame:
             columns=artifacts['feature_columns'], fill_value=0
         )
 
-    return X_transformed
+    return X_transformed 
